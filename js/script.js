@@ -357,12 +357,14 @@ window.addEventListener('DOMContentLoaded', () => {
     sliderWrapper = document.querySelector('.offer__slider-wrapper'),
     slidesField = document.querySelector('.offer__slider-inner'),
     widthField = window.getComputedStyle(sliderWrapper).width,
-    slides = document.querySelectorAll('.offer__slide');
+    slides = document.querySelectorAll('.offer__slide'),
+    sliderCarousel = document.querySelector('.carousel-indicators');
 
   let offset = 0,
       index = 1,
       width = +widthField.slice(0, widthField.length - 2),
-      maxWidth = width * slides.length;
+      maxWidth = width * slides.length,
+      sliderDots;
 
   slidesField.style.width = 100 * slides.length + '%';
   slides.forEach(slide => {
@@ -404,69 +406,57 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function createCarouselDots() {
+    for(let i = 0; i < slides.length; i++) {
+      let dot = document.createElement('div');
+      dot.classList.add('dot');
+      dot.setAttribute('dot-slide-id', i + 1);
+      sliderCarousel.append(dot);
+    }
+    sliderDots = document.querySelectorAll('.dot');
+  }
+
+  function activingDot() {
+    sliderDots.forEach(dot => {
+      dot.classList.remove('dot-active');
+    });
+    sliderDots[index - 1].classList.add('dot-active');
+  }
+
+  function dotClicking(e) {
+    let dotID = e.target.getAttribute('dot-slide-id');
+    offset = width * (dotID - 1);
+    slidesField.style.transform = `translateX(-${offset}px)`;
+    index = dotID;
+    sliderCurrentNum.textContent = `0${index}`;
+    activingDot();
+  }
+
+  sliderCarousel.addEventListener('click', (e) => {
+    if(e.target.className === 'dot') {
+      dotClicking(e);
+    } 
+  });
+
   sliderPrev.addEventListener('click', () => {
     slideChange(false);
     --index;
     slideNumChange();
+    activingDot();
   });
 
   sliderNext.addEventListener('click', () => {
     slideChange(true);
     ++index;
     slideNumChange();
-  })
-
-  /*function slidesHide() {
-    slides.forEach( slide => {
-      slide.classList.add('hide');
-    });
-  }
-
-  function numValidation(currentNum, totalNum) {
-    if(currentNum > totalNum) {
-      sliderCurrentNum.textContent = '01';
-
-    } else if (currentNum < 1){
-        if(totalNum < 10) {
-          sliderCurrentNum.textContent = `0${totalNum}`;
-        } else {
-          sliderCurrentNum.textContent = totalNum;
-        }
-    } else {
-      sliderCurrentNum.textContent = `0${currentNum}`;
-    }
-  }
-
-  function showSlide() {
-    let currentNum = sliderCurrentNum.textContent - 1;
-    slides[currentNum].classList.remove('hide');
-  }
-
-  function slideNumChange(button) {
-    let currentNum = +sliderCurrentNum.textContent,
-        totalNum = +sliderTotalNum.textContent;
-    
-    if (button) {
-      currentNum++;
-    } else {
-      currentNum--;
-    }
-    
-    numValidation(currentNum, totalNum);
-    slidesHide();
-    showSlide();
-  }
-
-  sliderPrev.addEventListener('click', () => {
-    slideNumChange(false);
+    activingDot();
   });
 
-  sliderNext.addEventListener('click', () => {
-    slideNumChange(true);
-  })
+  createCarouselDots();
+  activingDot();
+  /////////////////////////////////////////////////////////
 
-  slidesHide();
-  showSlide(); */
-
+  //////////////////SLIDER NAVIGATION/////////////////////
+ 
 
 });
