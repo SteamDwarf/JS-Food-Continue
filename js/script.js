@@ -454,9 +454,88 @@ window.addEventListener('DOMContentLoaded', () => {
 
   createCarouselDots();
   activingDot();
-  /////////////////////////////////////////////////////////
 
-  //////////////////SLIDER NAVIGATION/////////////////////
- 
+  //////////////////////////////////////////////////
+
+  //////////////////CALCULATOR//////////////////////
+
+  const resultElem = document.querySelector('.calculating__result span'),
+        calculator = document.querySelector('.calculating__field');
+  let height, weight, age,
+      sex = 'female',
+      ratio = 1.375;
+
+  function choosingItem(e) {
+    if(e.target.className === 'calculating__choose-item' && e.target.localName !== 'input') {
+      if(e.target.getAttribute('data-ratio')) {
+        ratio = +e.target.getAttribute('data-ratio');
+        changeActiveClass(e.target);
+
+      } else if(e.target.getAttribute('id')){
+        sex = e.target.getAttribute('id');
+        changeActiveClass(e.target);
+      }
+    }
+  }
+
+  function setValueInput(id) {
+    const input = document.querySelector(`#${id}`);
+
+    switch(input.getAttribute('id')) {
+      case 'height':
+        height = +input.value;
+        break;
+      case 'weight':
+        weight = +input.value;
+        break;
+      case 'age':
+        age = +input.value;
+        break;
+    }
+  }
+
+  function changeActiveClass(element) {
+    deleteActiveClass(element.offsetParent);
+    element.classList.add('calculating__choose-item_active');
+  }
+
+  function deleteActiveClass(parent) {
+    let elements = parent.querySelectorAll('div');
+    elements.forEach(element => {
+      element.classList.remove('calculating__choose-item_active');
+    });
+  }
+
+  function calcTotal() {
+    if(!sex || !height || !weight || !age || !ratio) {
+      resultElem.textContent = 'Вы ввели не все данные.';
+      return;
+    }
+    let result = calcBMR(sex) * ratio;
+    resultElem.textContent = Math.round(result);
+  }
+
+  function calcBMR(sex) {
+    if(sex === 'female') {
+      let BMR = 447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age);
+      return BMR;
+
+    } else if(sex === 'male') {
+      let BMR = 88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age);
+      return BMR;
+    }
+  }
+
+  calculator.addEventListener('click', (e) => {
+    choosingItem(e);
+    calcTotal();
+  });
+
+  calculator.addEventListener('input', (e) => {
+    setValueInput(e.target.getAttribute('id'));
+    calcTotal();
+  });
+
+  calcTotal();
 
 });
